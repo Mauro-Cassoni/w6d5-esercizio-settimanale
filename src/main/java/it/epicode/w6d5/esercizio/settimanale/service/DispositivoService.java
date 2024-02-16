@@ -1,5 +1,6 @@
 package it.epicode.w6d5.esercizio.settimanale.service;
 
+import it.epicode.w6d5.esercizio.settimanale.enums.Disponibilita;
 import it.epicode.w6d5.esercizio.settimanale.exception.NotFoundException;
 import it.epicode.w6d5.esercizio.settimanale.model.Dipendente;
 import it.epicode.w6d5.esercizio.settimanale.model.Dispositivo;
@@ -39,6 +40,13 @@ public class DispositivoService {
 
     public Dispositivo updateDispositivo(int id, DispositivoRequest dispositivoRequest) throws NotFoundException{
         Dispositivo a = findDispositivoById(id);
+
+        if (a.getDisponibilita() == Disponibilita.ASSEGNATO){
+            throw new RuntimeException("questo dispositivo è già assegnato ad un altro utente");
+        } if (a.getDisponibilita() == Disponibilita.IN_MANUTENZIONE){
+            throw new RuntimeException("questo dispositivo è in manutenzione");
+        }
+
         a.setDipendente(dispositivoRequest.getDipendente());
         a.setDisponibilita(dispositivoRequest.getDisponibilita());
         a.setTipologia(dispositivoRequest.getTipologia());
