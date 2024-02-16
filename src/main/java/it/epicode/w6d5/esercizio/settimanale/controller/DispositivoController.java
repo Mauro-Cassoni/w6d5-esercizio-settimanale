@@ -1,6 +1,8 @@
 package it.epicode.w6d5.esercizio.settimanale.controller;
 
 import com.cloudinary.Cloudinary;
+import it.epicode.w6d5.esercizio.settimanale.enums.Disponibilita;
+import it.epicode.w6d5.esercizio.settimanale.exception.BadRequestException;
 import it.epicode.w6d5.esercizio.settimanale.exception.CustomResponse;
 import it.epicode.w6d5.esercizio.settimanale.exception.NotFoundException;
 import it.epicode.w6d5.esercizio.settimanale.model.Dipendente;
@@ -20,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.HashMap;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 
 @RestController
 @RequestMapping("/dispositivo")
@@ -56,6 +59,7 @@ public class DispositivoController {
 
     @PostMapping("")
     public ResponseEntity<CustomResponse> saveDispositivo(@RequestBody @Validated DispositivoRequest dispositivoRequest, BindingResult bindingResult){
+        if(bindingResult.hasErrors()) throw new BadRequestException(bindingResult.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).toList().toString());
         if (bindingResult.hasErrors()){
             return CustomResponse.error(bindingResult.getAllErrors().toString(), HttpStatus.BAD_REQUEST);
         }
@@ -69,6 +73,7 @@ public class DispositivoController {
 
     @PutMapping("/{id}")
     public ResponseEntity<CustomResponse> updateDispositivo(@PathVariable int id, @RequestBody @Validated DispositivoRequest dispositivoRequest, BindingResult bindingResult){
+        if(bindingResult.hasErrors()) throw new BadRequestException(bindingResult.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).toList().toString());
         if(bindingResult.hasErrors()){
             return CustomResponse.error(bindingResult.getAllErrors().toString(), HttpStatus.BAD_REQUEST);
         }
@@ -99,9 +104,11 @@ public class DispositivoController {
     }
 
     @PatchMapping("/{id}/set")
-    public ResponseEntity<CustomResponse> setDipendente(@PathVariable int id_dispositivo,@RequestParam("id_dipendente") int id_dipendente){
+    public ResponseEntity<CustomResponse> setDipendente(@PathVariable int id,@RequestParam int id_dipendente){
         try {
-            Dispositivo dispositivo = dispositivoService.setDipendente(id_dispositivo, id_dipendente);
+            Dispositivo dispositivo = dispositivoService.setDipendente(id, id_dipendente);
+            dispositivo.setDisponibilita(Disponibilita.ASSEGNATO);
+
             return CustomResponse.success(HttpStatus.OK.toString(), dispositivo, HttpStatus.OK);
         }
         catch (NotFoundException e){

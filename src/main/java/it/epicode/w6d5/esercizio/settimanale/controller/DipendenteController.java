@@ -1,6 +1,7 @@
 package it.epicode.w6d5.esercizio.settimanale.controller;
 
 import com.cloudinary.Cloudinary;
+import it.epicode.w6d5.esercizio.settimanale.exception.BadRequestException;
 import it.epicode.w6d5.esercizio.settimanale.exception.CustomResponse;
 import it.epicode.w6d5.esercizio.settimanale.exception.NotFoundException;
 import it.epicode.w6d5.esercizio.settimanale.model.Dipendente;
@@ -18,6 +19,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.HashMap;
+
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 
 @RestController
 @RequestMapping("/dipendente")
@@ -51,6 +54,7 @@ public class DipendenteController {
 
     @PostMapping("")
     public ResponseEntity<CustomResponse> saveDipendente(@RequestBody @Validated DipendenteRequest dipendenteRequest, BindingResult bindingResult){
+        if(bindingResult.hasErrors()) throw new BadRequestException(bindingResult.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).toList().toString());
         if (bindingResult.hasErrors()){
             return CustomResponse.error(bindingResult.getAllErrors().toString(), HttpStatus.BAD_REQUEST);
         }
@@ -64,6 +68,7 @@ public class DipendenteController {
 
     @PutMapping("/{id}")
     public ResponseEntity<CustomResponse> updateDipendente(@PathVariable int id, @RequestBody @Validated DipendenteRequest dipendenteRequest, BindingResult bindingResult){
+        if(bindingResult.hasErrors()) throw new BadRequestException(bindingResult.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage).toList().toString());
         if(bindingResult.hasErrors()){
             return CustomResponse.error(bindingResult.getAllErrors().toString(), HttpStatus.BAD_REQUEST);
         }
@@ -96,8 +101,8 @@ public class DipendenteController {
     @PatchMapping("/{id}/upload")
     public ResponseEntity<CustomResponse> uploadLogo(@PathVariable int id,@RequestParam("upload") MultipartFile file){
         try {
-            Dipendente dispositivo = dipendenteService.uploadLogo(id, (String)cloudinary.uploader().upload(file.getBytes(), new HashMap()).get("url"));
-            return CustomResponse.success(HttpStatus.OK.toString(), dispositivo, HttpStatus.OK);
+            Dipendente dipendente = dipendenteService.uploadLogo(id, (String)cloudinary.uploader().upload(file.getBytes(), new HashMap()).get("url"));
+            return CustomResponse.success(HttpStatus.OK.toString(), dipendente, HttpStatus.OK);
         }
         catch (IOException | NotFoundException e){
             return CustomResponse.error(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);

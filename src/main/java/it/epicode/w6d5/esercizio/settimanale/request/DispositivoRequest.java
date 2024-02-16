@@ -17,11 +17,9 @@ import lombok.Data;
 public class DispositivoRequest {
 
     @NotNull(message = "disponibilita obblogatoria")
-    @NotEmpty(message = "disponibilita obblogatoria")
     private Disponibilita disponibilita;
 
-    @NotNull(message = "disponibilita obblogatoria")
-    @NotEmpty(message = "disponibilita obblogatoria")
+    @NotNull(message = "tipologia obblogatoria")
     private Tipologia tipologia;
 
     private Dipendente dipendente;
