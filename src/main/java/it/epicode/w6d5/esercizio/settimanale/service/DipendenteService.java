@@ -36,7 +36,7 @@ public class DipendenteService {
     }
 
     public Dipendente updateDipendente(int id, DipendenteRequest dipendenteRequest) throws NotFoundException{
-        Dipendente a = new Dipendente();
+        Dipendente a = findDipendenteById(id);
         a.setNome(dipendenteRequest.getNome());
         a.setCognome(dipendenteRequest.getCognome());
         a.setEmail(dipendenteRequest.getEmail());
